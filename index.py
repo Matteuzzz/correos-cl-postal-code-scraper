@@ -6,11 +6,29 @@ def autocomplete_select(page, selector: str, value: str):
     page.click(selector)
     time.sleep(0.5)
     page.fill(selector, value)
-    time.sleep(1.2)  # dejar que cargue las sugerencias
+    time.sleep(1.2)
     page.keyboard.press("ArrowDown")
     time.sleep(0.3)
     page.keyboard.press("Enter")
     time.sleep(1)
+
+def ensure_autocomplete_selected(page, selector: str, expected_value: str, label: str, max_retries: int = 2):
+    for attempt in range(max_retries):
+        autocomplete_select(page, selector, expected_value)
+        actual = page.input_value(selector).strip().upper()
+        print(f"[DEBUG] Verificación {label}: intento {attempt + 1} → '{actual}'")
+        if expected_value.upper() in actual:
+            return True
+        print(f"[WARNING] El valor de {label} no se aplicó correctamente, reintentando...")
+    raise Exception(f"No se pudo seleccionar correctamente la {label} tras múltiples intentos.")
+
+def ensure_number_filled(page, selector: str, value: str):
+    page.fill(selector, value)
+    time.sleep(0.5)
+    filled = page.input_value(selector).strip()
+    if filled != value.strip():
+        raise Exception(f"El campo número no se llenó correctamente: esperado '{value}', actual '{filled}'")
+    return True
 
 def get_postal_code(commune: str, street: str, number: str) -> str:
     print(f"[INFO] Búsqueda iniciada: comuna='{commune}', calle='{street}', número='{number}'")
@@ -28,15 +46,14 @@ def get_postal_code(commune: str, street: str, number: str) -> str:
             page.wait_for_selector('input#mini-search-form-text', state="visible")
             time.sleep(1)
 
-            print("[INFO] Seleccionando comuna con autocompletado...")
-            autocomplete_select(page, 'input#mini-search-form-text', commune)
+            print("[INFO] Seleccionando comuna con verificación...")
+            ensure_autocomplete_selected(page, 'input#mini-search-form-text', commune, "comuna")
 
-            print("[INFO] Seleccionando calle con autocompletado...")
-            autocomplete_select(page, 'input#mini-search-form-text-direcciones', street)
+            print("[INFO] Seleccionando calle con verificación...")
+            ensure_autocomplete_selected(page, 'input#mini-search-form-text-direcciones', street, "calle")
 
-            print("[INFO] Ingresando número...")
-            page.fill('#_cl_cch_codigopostal_portlet_CodigoPostalPortlet_INSTANCE_MloJQpiDsCw9_numero', number)
-            time.sleep(0.5)
+            print("[INFO] Ingresando número con verificación...")
+            ensure_number_filled(page, '#_cl_cch_codigopostal_portlet_CodigoPostalPortlet_INSTANCE_MloJQpiDsCw9_numero', number)
 
             print("[INFO] Click fuera para activar validación...")
             page.click("label[for='mini-search-form-text']", force=True)
@@ -52,7 +69,7 @@ def get_postal_code(commune: str, street: str, number: str) -> str:
 
             print("[INFO] Esperando resultado del código postal...")
             result_locator = page.locator('#_cl_cch_codigopostal_portlet_CodigoPostalPortlet_INSTANCE_MloJQpiDsCw9_ddCodPostal')
-            result_locator.wait_for(timeout=12000)
+            result_locator.wait_for(state="visible", timeout=15000)
 
             code = result_locator.inner_text().strip()
             print(f"[INFO] Código postal encontrado: {code}")
