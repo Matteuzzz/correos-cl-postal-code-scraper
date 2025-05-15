@@ -9,6 +9,7 @@ This is a Python scraper that extracts Chilean postal codes from [correos.cl](ht
 - Fully automated browser-based scraping (headless by default)
 - Robust autocomplete handling for commune and street
 - Input verification for all fields
+- Input normalization: supports uppercase/lowercase, tildes, and special characters
 - JSON output:
   - On success: `{ "postalCode": "8260323" }`
   - On error: `{ "error": "..." }`
@@ -22,6 +23,7 @@ This is a Python scraper that extracts Chilean postal codes from [correos.cl](ht
 
 ```bash
 pip install -r requirements.txt
+playwright install
 ```
 
 ### 2. Run the scraper
@@ -58,6 +60,7 @@ python index.py "LA FLORIDA" "LAS ACACIAS" "7700"
 
 - This scraper uses `Playwright` under the hood.
 - Form fields require autocomplete selection; manual filling is not enough.
+- Input values are normalized to match Correos' expected format (e.g. `Peñalolén` → `PENALOLEN`)
 - Timeout is set to 20s by default per operation.
 
 ---
