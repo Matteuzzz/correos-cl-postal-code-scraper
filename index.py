@@ -1,12 +1,20 @@
 import sys
 import time
 import json
+import unicodedata
 from playwright.sync_api import sync_playwright, expect
 
 def wait(seconds: float, msg: str = ""):
     if msg:
         print(f"[WAIT] {msg} ({seconds}s)")
     time.sleep(seconds)
+
+def normalize_address_text(text: str) -> str:
+    """Normalize input by removing accents, converting to uppercase, and cleaning spaces."""
+    text = unicodedata.normalize("NFD", text)
+    text = text.encode("ascii", "ignore").decode("utf-8")
+    text = text.upper().strip()
+    return " ".join(text.split())
 
 def autocomplete_select(page, selector: str, value: str):
     page.click(selector)
@@ -38,6 +46,12 @@ def ensure_number_filled(page, selector: str, value: str):
 
 def get_postal_code(commune: str, street: str, number: str) -> dict:
     print(f"[INFO] Lookup started for commune='{commune}', street='{street}', number='{number}'")
+
+    # Normalize all input values before sending to Correos
+    commune = normalize_address_text(commune)
+    street = normalize_address_text(street)
+    number = normalize_address_text(number)
+
     browser = None
     page = None
 
