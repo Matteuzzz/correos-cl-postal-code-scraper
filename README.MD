@@ -10,7 +10,7 @@ This is a Python scraper that extracts Chilean postal codes from [correos.cl](ht
 - Robust autocomplete handling for commune and street
 - Input verification for all fields
 - JSON output:
-  - On success: `{ "postalCode": "8171167" }`
+  - On success: `{ "postalCode": "8260323" }`
   - On error: `{ "error": "..." }`
 - Ready to convert into an API with Django
 
