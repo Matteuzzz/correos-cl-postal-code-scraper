@@ -2,87 +2,86 @@ import sys
 import time
 from playwright.sync_api import sync_playwright, expect
 
-def get_postal_code(commune: str, street: str, number: str) -> str:
-    print(f"[INFO] Launching Playwright for commune='{commune}', street='{street}', number='{number}'")
+def autocomplete_select(page, selector: str, value: str):
+    page.click(selector)
+    time.sleep(0.5)
+    page.fill(selector, value)
+    time.sleep(1.2)  # dejar que cargue las sugerencias
+    page.keyboard.press("ArrowDown")
+    time.sleep(0.3)
+    page.keyboard.press("Enter")
+    time.sleep(1)
 
+def get_postal_code(commune: str, street: str, number: str) -> str:
+    print(f"[INFO] Búsqueda iniciada: comuna='{commune}', calle='{street}', número='{number}'")
     browser = None
+    page = None
+
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=False)
             page = browser.new_page()
+            page.set_default_timeout(20000)
 
-            print("[INFO] Navigating to Correos de Chile postal code page...")
-            page.goto("https://www.correos.cl/codigo-postal", timeout=15000)
-
-            print("[INFO] Waiting for page to fully render...")
-            time.sleep(3)
-
-            print("[INFO] Typing commune into input field...")
-            page.fill('input#mini-search-form-text', commune)
-            page.keyboard.press("Enter")
-            time.sleep(1.5)
-
-            print("[INFO] Typing street into input field...")
-            page.fill('input#mini-search-form-text-direcciones', street)
-            page.keyboard.press("Enter")
-            time.sleep(1.5)
-
-            print("[INFO] Typing number into input field...")
-            page.fill('#_cl_cch_codigopostal_portlet_CodigoPostalPortlet_INSTANCE_MloJQpiDsCw9_numero', number)
+            print("[INFO] Cargando página de códigos postales...")
+            page.goto("https://www.correos.cl/codigo-postal")
+            page.wait_for_selector('input#mini-search-form-text', state="visible")
             time.sleep(1)
 
-            print("[INFO] Simulating blur by clicking outside...")
-            page.click("label[for='mini-search-form-text']")
-            time.sleep(1.5)
+            print("[INFO] Seleccionando comuna con autocompletado...")
+            autocomplete_select(page, 'input#mini-search-form-text', commune)
 
-            search_button = page.locator('#_cl_cch_codigopostal_portlet_CodigoPostalPortlet_INSTANCE_MloJQpiDsCw9_searchDirection')
-            print("[INFO] Waiting for the 'Search' button to be enabled...")
-            expect(search_button).to_be_enabled(timeout=10000)
-            print("[INFO] Search button is now enabled. Clicking it...")
-            search_button.click()
+            print("[INFO] Seleccionando calle con autocompletado...")
+            autocomplete_select(page, 'input#mini-search-form-text-direcciones', street)
 
-            print("[INFO] Waiting for the postal code box to appear...")
-            page.wait_for_selector("div.codigo-postal-box", timeout=12000)
+            print("[INFO] Ingresando número...")
+            page.fill('#_cl_cch_codigopostal_portlet_CodigoPostalPortlet_INSTANCE_MloJQpiDsCw9_numero', number)
+            time.sleep(0.5)
 
-            print("[INFO] Reading postal code from DOM...")
-            raw_result = page.inner_text("div.codigo-postal-box").strip()
-            print(f"[DEBUG] Raw result: '{raw_result}'")
+            print("[INFO] Click fuera para activar validación...")
+            page.click("label[for='mini-search-form-text']", force=True)
+            time.sleep(1)
 
-            if "Código Postal:" in raw_result:
-                code = raw_result.split("Código Postal:")[-1].strip().split()[0]
-                print(f"[INFO] Postal code found: {code}")
-                return code
-            else:
-                print("[WARNING] Could not extract code from visible text.")
-                return "Postal code not found."
+            search_btn = page.locator('#_cl_cch_codigopostal_portlet_CodigoPostalPortlet_INSTANCE_MloJQpiDsCw9_searchDirection')
+            print("[INFO] Esperando que el botón 'Buscar' esté habilitado...")
+            expect(search_btn).to_be_enabled(timeout=10000)
 
-    except KeyboardInterrupt:
-        print("\n[INFO] Script interrupted by user.")
-        return "Execution manually interrupted."
+            print("[INFO] Haciendo click en 'Buscar'...")
+            search_btn.click(force=True)
+            time.sleep(2)
+
+            print("[INFO] Esperando resultado del código postal...")
+            result_locator = page.locator('#_cl_cch_codigopostal_portlet_CodigoPostalPortlet_INSTANCE_MloJQpiDsCw9_ddCodPostal')
+            result_locator.wait_for(timeout=12000)
+
+            code = result_locator.inner_text().strip()
+            print(f"[INFO] Código postal encontrado: {code}")
+            return code
 
     except Exception as e:
-        print(f"[ERROR] Exception occurred: {str(e)}")
+        print(f"[ERROR] Error durante la ejecución: {str(e)}")
         try:
-            page.screenshot(path="error_screenshot.png")
-            print("[DEBUG] Screenshot saved as error_screenshot.png")
-        except:
-            pass
+            if page:
+                page.screenshot(path="error.png")
+                print("[DEBUG] Screenshot guardado como error.png")
+        except Exception as ss_err:
+            print(f"[WARNING] No se pudo capturar screenshot: {ss_err}")
         return f"Error: {str(e)}"
 
     finally:
         if browser:
             try:
-                print("[INFO] Closing browser...")
+                print("[INFO] Cerrando navegador...")
                 browser.close()
             except Exception:
-                print("[WARNING] Browser was already closed or unreachable.")
+                print("[WARNING] El navegador ya estaba cerrado.")
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print("Usage: python index.py 'Commune' 'Street' 'Number'")
-        print("Example: python index.py 'PUENTE ALTO' 'AVENIDA LAS PERDICES' '3462'")
+        print("Uso: python script.py 'Comuna' 'Calle' 'Número'")
+        print("Ejemplo: python script.py 'PUENTE ALTO' 'AVENIDA LAS PERDICES' '3462'")
         sys.exit(1)
 
-    commune, street, number = sys.argv[1], sys.argv[2], sys.argv[3]
-    result = get_postal_code(commune, street, number)
-    print(f"[FINAL RESULT] {result}")
+    comuna, calle, numero = sys.argv[1], sys.argv[2], sys.argv[3]
+    resultado = get_postal_code(comuna, calle, numero)
+    print(f"[RESULTADO FINAL] {resultado}")
