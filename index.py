@@ -2,15 +2,20 @@ import sys
 import time
 from playwright.sync_api import sync_playwright, expect
 
+def wait(seconds: float, msg: str = ""):
+    if msg:
+        print(f"[WAIT] {msg} ({seconds}s)")
+    time.sleep(seconds)
+
 def autocomplete_select(page, selector: str, value: str):
     page.click(selector)
-    time.sleep(0.5)
+    wait(0.5)
     page.fill(selector, value)
-    time.sleep(1.2)
+    wait(1.2)
     page.keyboard.press("ArrowDown")
-    time.sleep(0.3)
+    wait(0.3)
     page.keyboard.press("Enter")
-    time.sleep(1)
+    wait(1)
 
 def ensure_autocomplete_selected(page, selector: str, expected_value: str, label: str, max_retries: int = 2):
     for attempt in range(max_retries):
@@ -24,7 +29,7 @@ def ensure_autocomplete_selected(page, selector: str, expected_value: str, label
 
 def ensure_number_filled(page, selector: str, value: str):
     page.fill(selector, value)
-    time.sleep(0.5)
+    wait(0.5)
     filled = page.input_value(selector).strip()
     if filled != value.strip():
         raise Exception(f"El campo número no se llenó correctamente: esperado '{value}', actual '{filled}'")
@@ -37,14 +42,14 @@ def get_postal_code(commune: str, street: str, number: str) -> str:
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch(headless=True)
             page = browser.new_page()
             page.set_default_timeout(20000)
 
             print("[INFO] Cargando página de códigos postales...")
             page.goto("https://www.correos.cl/codigo-postal")
             page.wait_for_selector('input#mini-search-form-text', state="visible")
-            time.sleep(1)
+            wait(1)
 
             print("[INFO] Seleccionando comuna con verificación...")
             ensure_autocomplete_selected(page, 'input#mini-search-form-text', commune, "comuna")
@@ -57,7 +62,7 @@ def get_postal_code(commune: str, street: str, number: str) -> str:
 
             print("[INFO] Click fuera para activar validación...")
             page.click("label[for='mini-search-form-text']", force=True)
-            time.sleep(1)
+            wait(1)
 
             search_btn = page.locator('#_cl_cch_codigopostal_portlet_CodigoPostalPortlet_INSTANCE_MloJQpiDsCw9_searchDirection')
             print("[INFO] Esperando que el botón 'Buscar' esté habilitado...")
@@ -65,7 +70,7 @@ def get_postal_code(commune: str, street: str, number: str) -> str:
 
             print("[INFO] Haciendo click en 'Buscar'...")
             search_btn.click(force=True)
-            time.sleep(2)
+            wait(2)
 
             print("[INFO] Esperando resultado del código postal...")
             result_locator = page.locator('#_cl_cch_codigopostal_portlet_CodigoPostalPortlet_INSTANCE_MloJQpiDsCw9_ddCodPostal')
