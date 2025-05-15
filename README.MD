@@ -27,7 +27,7 @@ pip install -r requirements.txt
 ### 2. Run the scraper
 
 ```bash
-python index.py "PUENTE ALTO" "AVENIDA LAS PERDICES" "3462"
+python index.py "LA FLORIDA" "LAS ACACIAS" "7700"
 ```
 
 ### Example Output (Success)
