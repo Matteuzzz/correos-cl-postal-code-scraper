@@ -33,7 +33,7 @@ python index.py "LA FLORIDA" "LAS ACACIAS" "7700"
 ### Example Output (Success)
 
 ```json
-{ "postalCode": "8171167" }
+{ "postalCode": "8260323" }
 ```
 
 ### Example Output (Error)
