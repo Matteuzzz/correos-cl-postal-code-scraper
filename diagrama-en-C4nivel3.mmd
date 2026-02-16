@@ -1,0 +1,36 @@
+graph TD
+    subgraph Container_PythonApp [Contenedor: Aplicación de Scraping Python]
+        direction TB
+
+        CLI["Componente: Interfaz de Usuario / CLI<br/>(Main Entry)<br/><br/>Recibe direcciones y orquesta el flujo."]
+        
+        PlaywrightEngine["Componente: Motor Playwright<br/><br/>Gestiona la sesión del navegador (Chromium) y contextos."]
+        
+        NavigationLogic["Componente: Lógica de Navegación<br/><br/>Maneja esperas, carga de URL y timeouts."]
+        
+        FormAutomation["Componente: Automatización de Formulario<br/><br/>Escribe en inputs de Calle y Número."]
+        
+        AutocompleteHandler["Componente: Gestor de Autocompletado<br/><br/>Detecta y selecciona sugerencias dinámicas del sitio."]
+        
+        DataExtractor["Componente: Extractor de Datos<br/><br/>Extrae el Código Postal final del DOM."]
+        
+        ErrorManager["Componente: Gestor de Errores<br/><br/>Maneja casos de 'Dirección no encontrada' o bloqueos."]
+    end
+
+    %% Flujo interno
+    CLI --> PlaywrightEngine
+    PlaywrightEngine --> NavigationLogic
+    NavigationLogic --> FormAutomation
+    FormAutomation --> AutocompleteHandler
+    AutocompleteHandler --> DataExtractor
+    DataExtractor --> CLI
+    
+    %% Conexiones externas
+    PlaywrightEngine -.->|Controla| BrowserInstance["Instancia de Navegador<br/>(Headless Mode)"]
+    BrowserInstance <-->|Peticiones HTTP/JS| WebCorreos["Portal de Correos Chile<br/>(consulta.correos.cl)"]
+
+    style Container_PythonApp fill:#fdfdfd,stroke:#333,stroke-width:2px
+    style CLI fill:#cfe2ff,stroke:#0d6efd
+    style PlaywrightEngine fill:#cfe2ff,stroke:#0d6efd
+    style FormAutomation fill:#cfe2ff,stroke:#0d6efd
+    style DataExtractor fill:#cfe2ff,stroke:#0d6efd
